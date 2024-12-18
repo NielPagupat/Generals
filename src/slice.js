@@ -6,6 +6,7 @@ export const gameSlice = createSlice({
     players: {
       player1: {
         playerName: "",
+        RoomCode: "",
         generalsKilled: 0,
         spiesKilled: 0,
         tokens: [
@@ -34,6 +35,7 @@ export const gameSlice = createSlice({
       },
       player2: {
         playerName: "",
+        RoomCode: "",
         generalsKilled: 0,
         spiesKilled: 0,
         tokens: [
@@ -88,6 +90,16 @@ export const gameSlice = createSlice({
       if (generalsKilled !== undefined) state.players[player].generalsKilled += generalsKilled;
       if (spiesKilled !== undefined) state.players[player].spiesKilled += spiesKilled;
     },
+
+    setPlayerName: (state, action) => {
+      const { player, playerName } = action.payload;
+      state.players[player].playerName = playerName;
+    },
+    setRoomCode: (state, action) => {
+      const { player, roomCode } = action.payload;
+      state.players[player].RoomCode = roomCode;
+    },
+    
   },
 });
 
@@ -97,6 +109,8 @@ export const {
   toggleSkillActive,
   decrementCooldown,
   updatePlayerStats,
+  setPlayerName,
+  setRoomCode,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
