@@ -14,7 +14,7 @@ import store from './store.js'
 import { Provider } from 'react-redux'
 
 const Landing = lazy(delayImport(() => import('./Pages/LandingPage.jsx'), 2000));
-
+const GamePage = lazy(delayImport(()=> import('./Pages/GamePage.jsx'), 2000))
 
 const router = createBrowserRouter([
   {path: "/", element: <Landing />,
@@ -24,6 +24,10 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {path: '/GamePage', element: <GamePage />
+
+  },
+
 ])
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
