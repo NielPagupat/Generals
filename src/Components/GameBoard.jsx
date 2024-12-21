@@ -8,6 +8,7 @@ export default function GameBoard() {
 
   const dispatch = useDispatch()
   
+  
   const player1 = useSelector((state) => state.game.players.player1);
   const player2 = useSelector((state) => state.game.players.player2);
 
@@ -15,18 +16,41 @@ export default function GameBoard() {
   const horizontalAxis = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
   const board = [];
-
+  const [prepStage, SetPrepStage] = useState(false) 
+  const [playerTurn, setPlayerTurn] = useState("player1")
   const [piece, setPiece] = useState({
     piece: {},
     player: ""
   })
+
   const movePiece = (x, y) => {
-    dispatch(setTokenPosition({
-      player: piece.player,
-      tokenType: piece.piece.type,
-      position: {x:x, y:y}
-    }))
-    console.log(piece)
+    if (prepStage) {
+      dispatch(
+        setTokenPosition({
+          player: piece.player,
+          tokenType: piece.piece.type,
+          position: { x: x, y: y },
+        })
+      )
+    } else {
+      if (piece.player === playerTurn) {
+        dispatch(
+          setTokenPosition({
+            player: piece.player,
+            tokenType: piece.piece.type,
+            position: { x: x, y: y },
+          })
+        );
+    
+        // Switch turn to the other player
+        setPlayerTurn(playerTurn === "player1" ? "player2" : "player1");
+    }
+  }
+    
+    setPiece({
+      piece: {},
+      player: ""
+    })
     
   }
 
@@ -92,10 +116,21 @@ for (let col = verticalAxis.length - 1; col >= 0; col--) {
   const PrepBoardPlayer2 = []
 
   player1.tokens.map((piece)=> {
-    PrepBoardPlayer1.push(<Tiles cellKey={piece.type} rowColor={"bg-white"} Piece={<Piece icon={piece.icon} color={player1.color}/>}/> )
+    if (piece.position.x == null || piece.position.y == null) {
+      PrepBoardPlayer1.push(<Tiles cellKey={piece.type} rowColor={"bg-white"} onClick={()=>(grabPiece("piece", piece), grabPiece("player", "player1"))}
+                     Piece={<Piece icon={piece.icon} color={player1.color} grab={()=>(grabPiece("piece", piece), grabPiece("player", "player1"))}/>}/> )
+    } else {
+      PrepBoardPlayer1.push(<Tiles cellKey={piece.type} rowColor={"bg-white"}/>)
+    }
+    
   })
   player2.tokens.map((piece)=> {
-    PrepBoardPlayer2.push(<Tiles cellKey={piece.type} rowColor={"bg-white"} Piece={<Piece icon={piece.icon} color={player2.color}/>}/> )
+    if (piece.position.x == null || piece.position.y == null) {
+      PrepBoardPlayer2.push(<Tiles cellKey={piece.type} rowColor={"bg-white"} onClick={()=>(grabPiece("piece", piece), grabPiece("player", "player2"))}
+                            Piece={<Piece icon={piece.icon} color={player2.color} grab={()=>(grabPiece("piece", piece), grabPiece("player", "player2"))}/>}/> )
+    } else {
+      PrepBoardPlayer2.push(<Tiles cellKey={piece.type} rowColor={"bg-white"} />)
+    }
   })
 
   
