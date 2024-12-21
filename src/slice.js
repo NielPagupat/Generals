@@ -69,8 +69,23 @@ export const gameSlice = createSlice({
   reducers: {
     setTokenPosition: (state, action) => {
       const { player, tokenType, position } = action.payload;
-      const token = state.players[player].tokens.find((t) => t.type === tokenType);
-      if (token) token.position = position;
+    
+      // Ensure the position format is valid
+      if (
+        typeof position === 'object' &&
+        position !== null &&
+        'x' in position &&
+        'y' in position &&
+        typeof position.x === 'number' &&
+        typeof position.y === 'number'
+      ) {
+        const token = state.players[player]?.tokens.find((t) => t.type === tokenType);
+        if (token) {
+          token.position = { x: position.x, y: position.y }; // Assign the validated position
+        }
+      } else {
+        console.warn('Invalid position format provided:', position);
+      }
     },
     updateSkillCharge: (state, action) => {
       const { player, tokenType, skillcharge } = action.payload;

@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Tiles from './Tiles';
 import Piece from './Piece';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTokenPosition } from '../slice';
 
 export default function GameBoard() {
 
+  const dispatch = useDispatch()
+  
   const player1 = useSelector((state) => state.game.players.player1);
   const player2 = useSelector((state) => state.game.players.player2);
 
@@ -12,6 +15,27 @@ export default function GameBoard() {
   const horizontalAxis = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
   const board = [];
+
+  const [piece, setPiece] = useState({
+    piece: {},
+    player: ""
+  })
+  const movePiece = (x, y) => {
+    dispatch(setTokenPosition({
+      player: piece.player,
+      tokenType: piece.piece.type,
+      position: {x:x, y:y}
+    }))
+    console.log(piece)
+    
+  }
+
+  const grabPiece = (key, value) => {
+    setPiece(prevState => ({
+      ...prevState,
+      [key]: value
+    }))
+  }
 
 for (let col = verticalAxis.length - 1; col >= 0; col--) {
   let rowColor = "";
@@ -33,15 +57,16 @@ for (let col = verticalAxis.length - 1; col >= 0; col--) {
       (t) => t.position.x === row && t.position.y === col
     );
 
-    console.log(`Cell: ${cellKey}, Token1:`, token1, "Token2:", token2);
+    // console.log(`Cell: ${cellKey}, Token1:`, token1, "Token2:", token2);
 
     if (token1) {
       // Place player1 token if present
       board.push(
         <Tiles
           cellKey={cellKey}
-          rowColor={"bg-white"}
-          Piece={<Piece icon={token1.icon} color={player1.color} />}
+          rowColor={rowColor}
+          onClick={()=>(grabPiece("piece", token1), grabPiece("player", "player1"))}
+          Piece={<Piece icon={token1.icon} color={player1.color} grab={()=>(grabPiece("piece", token1), grabPiece("player", "player1"))}/>}
         />
       );
     } else if (token2) {
@@ -49,13 +74,14 @@ for (let col = verticalAxis.length - 1; col >= 0; col--) {
       board.push(
         <Tiles
           cellKey={cellKey}
-          rowColor={"bg-white"}
-          Piece={<Piece icon={token2.icon} color={player2.color} />}
+          rowColor={rowColor}
+          onClick={()=>(grabPiece("piece", token2), grabPiece("player", "player2"))}
+          Piece={<Piece icon={token2.icon} color={player2.color} grab={()=>(grabPiece("piece", token2), grabPiece("player", "player2"))}/>}
         />
       );
     } else {
       // Empty cell
-      board.push(<Tiles cellKey={cellKey} rowColor={rowColor} />);
+      board.push(<Tiles cellKey={cellKey} rowColor={rowColor} onClick={()=>movePiece(row, col)} drop={()=>movePiece(row, col)}/>);
     }
   }
 }
